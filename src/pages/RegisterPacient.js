@@ -135,7 +135,6 @@ class RegisterPacient extends Component {
 
             <br />
             <label>ethnicGroup:</label>
-            <Link to="../GrupoEthnic">Haz clic para ver la página de contacto</Link>
             <br />
             <input
               type="text"
