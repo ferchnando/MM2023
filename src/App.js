@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, RequireAuth } from "./context/Auth";
 import Layout from "./components/layout";
 import HomePage from "./pages/Home";
+import SignUpPage from "./pages/SignUp";
 import LoginPage from "./pages/Login";
 import LogoutPage from "./pages/Logout";
 import NewPatientPage from "./pages/RegisterPacient";
@@ -15,6 +16,7 @@ const App = () => {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/logout" element={<LogoutPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
