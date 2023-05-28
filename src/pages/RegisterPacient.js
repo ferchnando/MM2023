@@ -117,7 +117,7 @@ class RegisterPacient extends Component {
             <input
               type="text"
               className="form-control"
-              name="paternallastname:"
+              name="maternallastname:"
               onChange={this.handleChange}
             />
             <br />
@@ -135,23 +135,35 @@ class RegisterPacient extends Component {
 
             <br />
             <label>ethnicGroup:</label>
-            <button className="btn btn-primary" >Crear Grupo etnico</button>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="paternallastname:"
-              onChange={this.handleChange}
-            />
+            {this.state.isModalOpen && <AddressForm />}
+          <Button handleShowForm={this.openModal} />
             <br />
 
+              <Modal
+              isOpen={this.state.isModalOpen}
+              onRequestClose={this.closeModal}
+              contentLabel="Address Form Modal"
+            ></Modal>
+
+            <Modal>
+
+              
+                <input
+                    type="text"
+                    className="form-control"
+                    name="ethnicGroup"
+                    onChange={this.handleChange}
+                  />
+                <br />
+
+            </Modal>
             <br />
             <label>OCUPATION:</label>
             <br />
             <input
               type="text"
               className="form-control"
-              name="paternallastname:"
+              name="ocupation"
               onChange={this.handleChange}
             />
             <br />
@@ -162,7 +174,7 @@ class RegisterPacient extends Component {
             <input
               type="date"
               className="form-control"
-              name="paternallastname:"
+              name="birthdate"
               onChange={this.handleChange}
             />
             <br />
