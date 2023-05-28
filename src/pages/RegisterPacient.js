@@ -1,56 +1,184 @@
-
-import React, { Component, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/RegisterPacient.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import Modal from 'react-modal';
 import AddressForm from './Address';
+import OccupationForm from './Occupation';
 import { API_BASE_URL } from '../config';
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { useAuth } from "../context/Auth";
 
-const baseUrl = API_BASE_URL+'Person';
+// Define el elemento de la aplicación principal
+Modal.setAppElement('#root');
+
+const baseUrl = API_BASE_URL + 'Person';
+const ethnicGroupsUrl = API_BASE_URL + 'ethnic-groups';
+const occupationsUrl = API_BASE_URL + 'occupations';
+const countriesUrl = API_BASE_URL + 'countries';
+const regionsUrl = API_BASE_URL + 'regions';
+const addressesUrl = API_BASE_URL + 'addresses';
 
 const Button = ({ handleShowForm }) => (
   <div>
-    <button className="btn btn-primary" onClick={handleShowForm}>Create New Address</button>
+    <button className="btn btn-primary" onClick={handleShowForm}>Create Address</button>
   </div>
 );
 
-class RegisterPacient extends Component {
-  state = {
-    form: {
-      identification: '',
-      firstname: '',
-      secondname: '',
-      paternallastname: '',
-      maternalLastname: '',
-      gender: '',
-      ethnicGroup: [],
-      occupation: '',
-      birthdate: '',
-      maritalStatus: '',
-      phonenumber: '',
-      address: [],
-      educationalLevel: '',
-      related: '',
-      relationship: '',
-      image: ''
-    },
-    isModalOpen: false
+const RegisterPacient = () => {
+  const { user } = useAuth();
+  const [ethnicGroupform, ethnicGroupsetForm] = useState({
+    id: '',
+    name: ''
+  });
+
+  const [form, setForm] = useState({
+    identification: '',
+    firstname: '',
+    secondname: '',
+    paternallastname: '',
+    maternalLastname: '',
+    gender: '',
+    ethnicGroup: [],
+    occupation: '',
+    birthdate: '',
+    maritalStatus: '',
+    phonenumber: '',
+    address: [],
+    educationalLevel: '',
+    related: '',
+    relationship: '',
+    image: ''
+  });
+  
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isOccupationModalOpen, setIsOccupationModalOpen] = useState(false);
+  const [occupationForm, setOccupationForm] = useState({
+    name: ''
+  });
+  const [ethnicGroups, setEthnicGroups] = useState([]);
+  const [selectedEthnicGroup, setSelectedEthnicGroup] = useState(null);
+  
+  const [occupations, setOccupations] = useState([]);
+  const [selectedOccupation, setSelectedOccupation] = useState(null);
+
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  const [regions, setRegions] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState(null);
+
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  useEffect(() => {
+    const fetchEthnicGroups = async () => {
+      try {
+        const response = await axios.get(ethnicGroupsUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        console.log(response.data);
+        setEthnicGroups(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchOcupations = async () => {
+      try {
+        const response = await axios.get(occupationsUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        console.log(response.data);
+        setOccupations(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(countriesUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        console.log(response.data);
+        setCountries(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(regionsUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        console.log(response.data);
+        setRegions(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const fetchAddresses = async () => {
+      try {
+        const response = await axios.get(addressesUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        console.log(response.data);
+        setAddresses(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCountries();
+    fetchRegions();
+    fetchAddresses();
+    fetchEthnicGroups();
+    fetchOcupations();
+  }, [isOccupationModalOpen, isAddressModalOpen]);
+
+  const handleEthnicGroupChange = (event, value) => {
+    setSelectedEthnicGroup(value);
+  };
+  const handleOccupationChange = (event, value) => {
+    setSelectedOccupation(value);
   };
 
-  handleChange = (e) => {
+  const handleCountryChange = (event, value) => {
+    setSelectedCountry(value);
+  };
+
+  const handleRegionChange = (event, value) => {
+    setSelectedRegion(value);
+  };
+
+  const handleAddressChange = (event, value) => {
+    setSelectedAddress(value);
+  };
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    this.setState((prevState) => ({
-      form: {
-        ...prevState.form,
-        [name]: value
-      }
+    setForm((prevState) => ({
+      ...prevState,
+      [name]: value
     }));
   };
 
-  registPerson = async () => {
+  const registPerson = async () => {
     try {
-      const response = await axios.post(baseUrl, this.state.form);
+      const response = await axios.post(baseUrl, form);
       if (response.data.length > 0) {
         // Success
       } else {
@@ -61,168 +189,198 @@ class RegisterPacient extends Component {
     }
   };
 
-  openModal = () => {
-    this.setState({ isModalOpen: true });
+  /*const openModal = () => {
+    setIsModalOpen(true);
   };
 
-  closeModal = () => {
-    this.setState({ isModalOpen: false });
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };*/
+
+  const openAddressModal = () => {
+    setIsAddressModalOpen(true);
+  };
+  
+  const closeAddressModal = () => {
+    setIsAddressModalOpen(false);
+  };
+  
+  const openOccupationModal = () => {
+    setIsOccupationModalOpen(true);
+  };
+  
+  const closeOccupationModal = () => {
+    setIsOccupationModalOpen(false);
   };
 
-    render() {
-    return (
-      <div className="form-group">
-        <h1>CREAR PACIENTE</h1>
-        <label>Identification: </label>
-        <br />
-        <input
-          type="text"
-          className="form-control"
-          name="identification"
-          onChange={this.handleChange}
+  const handleOccupationFormSubmit = async (formData) => {
+    // Realizar las acciones necesarias con los datos del formulario
+    closeOccupationModal();
+  };
+
+  return (
+    <div className="form-group">
+      <h1>Person and Appointments</h1>
+      <label>Identification: </label>
+      <input
+        type="text"
+        className="form-control"
+        name="identification"
+        onChange={handleChange}
+      />
+      <br />
+      <label>Firstname: </label>
+      <input
+        type="text"
+        className="form-control"
+        name="firstname"
+        onChange={handleChange}
+      />
+      <br />
+      <label>Secondname: </label>
+      <input
+        type="text"
+        className="form-control"
+        name="secondname"
+        onChange={handleChange}
+      />
+      <br />
+      <label>Paternal Lastname: </label>
+      <input
+        type="text"
+        className="form-control"
+        name="paternallastname"
+        onChange={handleChange}
+      />
+      <br />
+      <label>Maternal Lastname: </label>
+      <input
+        type="text"
+        className="form-control"
+        name="maternalLastname"
+        onChange={handleChange}
+      />
+      <br />
+      <label>Gender:</label>
+      <select
+        className="form-control"
+        name="gender"
+        onChange={handleChange}
+      >
+        <option value="" disabled>Select Gender</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+      </select>
+      <br />
+      <label>Ethnic Group:</label>
+      <Autocomplete
+        options={ethnicGroups}
+        getOptionLabel={(ethnicGroup) => ethnicGroup.name}
+        value={selectedEthnicGroup}
+        onChange={handleEthnicGroupChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Ethnic Group"
+            variant="outlined"
+          />
+        )}
+      />
+      <label>Occupation:</label>
+      <Autocomplete
+        options={occupations}
+        getOptionLabel={(occupation) => occupation.name}
+        value={selectedOccupation}
+        onChange={handleOccupationChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Occupation"
+            variant="outlined"
+          />
+        )}
+      />
+      <button className="btn btn-primary" onClick={openOccupationModal}>Add Occupation</button>
+      <Modal
+        isOpen={isOccupationModalOpen}
+        onRequestClose={closeOccupationModal}
+        contentLabel="Occupation Modal"
+        ariaHideApp={false}
+      >
+        <h2>Add Occupation</h2>
+        <OccupationForm onSubmit={handleOccupationFormSubmit} />
+        <button onClick={closeOccupationModal}>Cancel</button>
+      </Modal>
+      <br />
+      <label>Birthdate:</label>
+      <input
+        type="date"
+        className="form-control"
+        name="birthdate"
+        onChange={handleChange}
+      />
+      <br />
+      <div>
+        <h4>Address</h4>
+        <label>Country:</label>
+        <Autocomplete
+        options={countries}
+        getOptionLabel={(country) => country.name}
+        value={selectedCountry}
+        onChange={handleCountryChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Country"
+            variant="outlined"
+          />
+        )}
+      />
+        <label>Region:</label>
+        <Autocomplete
+          options={regions}
+          getOptionLabel={(region) => region.name}
+          value={selectedRegion}
+          onChange={handleRegionChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Region"
+              variant="outlined"
+              required />
+          )}
         />
-            <br />
-            <label>firstname: </label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="firstname"
-              onChange={this.handleChange}
-            />
-            <br />
-            <label>SecondName: </label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="secondname"
-              onChange={this.handleChange}
-            />
-            <br />
-            <label>paternallastname: </label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="paternallastname:"
-              onChange={this.handleChange}
-            />
-            <br />
-
-            <br />
-            <label>maternalLastname: </label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="maternallastname:"
-              onChange={this.handleChange}
-            />
-            <br />
-
-            <br />
-            <label>gender:</label>
-            <br />
-            <select 
-            type="text"  required>
-            <option name=" ">M</option>
-            <option name="">F</option>
-            onChange={this.handleChange}
-            </select>
-            <br />
-
-            <br />
-            <label>ethnicGroup:</label>
-            {this.state.isModalOpen && <AddressForm />}
-          <Button handleShowForm={this.openModal} />
-            <br />
-
-              <Modal
-              isOpen={this.state.isModalOpen}
-              onRequestClose={this.closeModal}
-              contentLabel="Address Form Modal"
-            ></Modal>
-
-            <Modal>
-
-              
-                <input
-                    type="text"
-                    className="form-control"
-                    name="ethnicGroup"
-                    onChange={this.handleChange}
-                  />
-                <br />
-
-            </Modal>
-            <br />
-            <label>OCUPATION:</label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="ocupation"
-              onChange={this.handleChange}
-            />
-            <br />
-
-            <br />
-            <label>birthdate::</label>
-            <br />
-            <input
-              type="date"
-              className="form-control"
-              name="birthdate"
-              onChange={this.handleChange}
-            />
-            <br />
-
-            <br />
-            <div>
-            <label>DIRECCION:</label>
-          {this.state.isModalOpen && <AddressForm />}
-          <Button handleShowForm={this.openModal} />
+        <label>Address:</label>
+        <Autocomplete
+          options={addresses}
+          getOptionLabel={(address) => address.mainStreet}
+          value={selectedAddress}
+          onChange={handleAddressChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Address"
+              variant="outlined"
+              required />
+          )}
+        required />
+        {isAddressModalOpen && <AddressForm />}
+          <Button handleShowForm={openAddressModal} />
 
           <Modal
-            isOpen={this.state.isModalOpen}
-            onRequestClose={this.closeModal}
+            isOpen={isAddressModalOpen}
+            onRequestClose={closeAddressModal}
             contentLabel="Address Form Modal"
           >
             <h2>Address Form</h2>
             <AddressForm />
-            <button onClick={this.closeModal}>Close</button>
+            <button onClick={closeAddressModal}>Close</button>
           </Modal>
-            <br />
-            <label>calle </label>
-            <input
-              type="text"
-              className="form-control"
-              name="mainstreet:"
-              onChange={this.handleChange}
-            />
-            <label>district: </label>
-            <input
-              type="text"
-              className="form-control"
-              name="district"
-              onChange={this.handleChange}
-            />
-            <label>region: </label>
-            <input
-              type="text"
-              className="form-control"
-              name="region"
-              onChange={this.handleChange}
-            />
-            <br />
-            </div>
-            <button className="btn btn-primary" onClick={()=> this.registPerson()}>Registrar Persona</button>
-          </div>
-        );
-    }
-}
-
-
+        <br />
+      </div>
+      <button className="btn btn-primary" onClick={registPerson}>Create</button>
+    </div>
+  );
+};
 
 export default RegisterPacient;

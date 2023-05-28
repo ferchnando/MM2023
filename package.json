@@ -16,7 +16,10 @@
     "react-router-dom": "^6.2.0",
     "react-scripts": "5.0.1",
     "sweetalert2": "^11.7.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@mui/material": "latest",
+    "@emotion/styled": "latest",
+    "@emotion/react": "latest"
   },
   "scripts": {
     "start": "react-scripts start --port 5000",

@@ -1,6 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { API_BASE_URL } from '../config';
+import { useAuth } from "../context/Auth";
+
+const addressesUrl = API_BASE_URL + 'addresses';
+const regionsUrl = API_BASE_URL + 'regions';
 
 const AddressForm = () => {
+  const [regions, setRegions] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     mainStreet: '',
     numbering: '',
@@ -12,6 +23,28 @@ const AddressForm = () => {
     region: ''
   });
 
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(regionsUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        console.log(response.data);
+        setRegions(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchRegions();
+  }, []);
+
+  const handleRegionChange = (event, value) => {
+    setSelectedRegion(value);
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -19,9 +52,22 @@ const AddressForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+    try {
+      console.log(selectedRegion._id);
+      formData.region = selectedRegion._id;
+      const occupationResponse = await axios.post(addressesUrl, formData, {
+        headers: {
+          Authorization: user
+        }
+      });
+      console.log(occupationResponse);
+    }
+    catch (error) {
+      console.log(error);
+    }
     // Resetear el formulario
     setFormData({
       mainStreet: '',
@@ -61,7 +107,19 @@ const AddressForm = () => {
         <input type="text" id="district" name="district" value={formData.district} onChange={handleChange} required />
 
         <label htmlFor="region">Región:</label>
-        <input type="text" id="region" name="region" value={formData.region} onChange={handleChange} required />
+        <Autocomplete
+          options={regions}
+          getOptionLabel={(region) => region.name}
+          value={selectedRegion}
+          onChange={handleRegionChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Region"
+              variant="outlined"
+              required />
+          )}
+        />
 
         <button type="submit">Guardar</button>
       </form>
