@@ -23,6 +23,9 @@ const Layout = () => {
           <li>
             <Link to="/NewPatient">New Patient</Link>
           </li>
+          <li>
+          <Link to="/PersonsList">Appointments</Link>
+          </li>
         </ul>
         <Outlet />
       </div>

@@ -10,16 +10,19 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useAuth } from "../context/Auth";
+import { useNavigate } from "react-router-dom";
 
 // Define el elemento de la aplicación principal
 Modal.setAppElement('#root');
 
-const baseUrl = API_BASE_URL + 'Person';
+const baseUrl = API_BASE_URL + 'person';
 const ethnicGroupsUrl = API_BASE_URL + 'ethnic-groups';
 const occupationsUrl = API_BASE_URL + 'occupations';
 const countriesUrl = API_BASE_URL + 'countries';
 const regionsUrl = API_BASE_URL + 'regions';
-const addressesUrl = API_BASE_URL + 'addresses';
+const regionsByCountryIdUrl = API_BASE_URL + 'regions/country/';
+const addressesUrl = API_BASE_URL + 'addresses/getAddressesByParams';
+const educationalLevelsUrl = API_BASE_URL + 'educational-levels';
 
 const Button = ({ handleShowForm }) => (
   <div>
@@ -28,6 +31,7 @@ const Button = ({ handleShowForm }) => (
 );
 
 const RegisterPacient = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [ethnicGroupform, ethnicGroupsetForm] = useState({
     id: '',
@@ -48,11 +52,51 @@ const RegisterPacient = () => {
     phonenumber: '',
     address: [],
     educationalLevel: '',
-    related: '',
-    relationship: '',
-    image: ''
+    related: null,
+    relationship: null,
+    image: null
   });
-  
+
+  const genderOptions = [
+    {
+      name: "Male",
+      id: "M"
+    },
+    {
+      name: "Female",
+      id: "F"
+    }
+  ];
+
+  const maritalStatusOptions = [
+    {
+      name: "Single",
+      id: "STATUS_SINGLE"
+    },
+    {
+      name: "Married",
+      id: "STATUS_MARRIED"
+    },
+    {
+      name: "Divorcied",
+      id: "STATUS_DIVORCIED"
+    },
+    {
+      name: "Widowed",
+      id: "STATUS_WIDOWED"
+    },
+    {
+      name: "Non Marital Union",
+      id: "STATUS_NON-MARITAL-UNION"
+    }
+  ];
+
+  const [genderParam, setGenderParam] = React.useState(genderOptions[0]);
+  const [maritalStatusParam, setMaritalStatusParam] = React.useState(maritalStatusOptions[0]);
+
+  const [addressParams, setAddressParams] = useState([]);
+  const { country, region, address } = addressParams;
+
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isOccupationModalOpen, setIsOccupationModalOpen] = useState(false);
   const [occupationForm, setOccupationForm] = useState({
@@ -60,9 +104,12 @@ const RegisterPacient = () => {
   });
   const [ethnicGroups, setEthnicGroups] = useState([]);
   const [selectedEthnicGroup, setSelectedEthnicGroup] = useState(null);
-  
+
   const [occupations, setOccupations] = useState([]);
   const [selectedOccupation, setSelectedOccupation] = useState(null);
+
+  const [educationalLevels, seteducationalLevels] = useState([]);
+  const [selectedEducationalLevel, setSelectedEducationalLevel] = useState(null);
 
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
@@ -81,7 +128,6 @@ const RegisterPacient = () => {
             Authorization: user
           }
         });
-        console.log(response.data);
         setEthnicGroups(response.data);
       } catch (error) {
         console.log(error);
@@ -95,8 +141,20 @@ const RegisterPacient = () => {
             Authorization: user
           }
         });
-        console.log(response.data);
         setOccupations(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchEducationalLevels = async () => {
+      try {
+        const response = await axios.get(educationalLevelsUrl, {
+          headers: {
+            Authorization: user
+          }
+        });
+        seteducationalLevels(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -109,7 +167,6 @@ const RegisterPacient = () => {
             Authorization: user
           }
         });
-        console.log(response.data);
         setCountries(response.data);
       } catch (error) {
         console.log(error);
@@ -117,12 +174,20 @@ const RegisterPacient = () => {
     };
     const fetchRegions = async () => {
       try {
-        const response = await axios.get(regionsUrl, {
-          headers: {
-            Authorization: user
-          }
-        });
-        console.log(response.data);
+        let response;
+        if (selectedCountry) {
+          response = await axios.get(regionsByCountryIdUrl + selectedCountry._id, {
+            headers: {
+              Authorization: user
+            }
+          });
+        } else {
+          response = await axios.get(regionsUrl, {
+            headers: {
+              Authorization: user
+            }
+          });
+        }
         setRegions(response.data);
       } catch (error) {
         console.log(error);
@@ -130,7 +195,12 @@ const RegisterPacient = () => {
     };
     const fetchAddresses = async () => {
       try {
-        const response = await axios.get(addressesUrl, {
+        const addressParams = {
+          country: selectedCountry ? selectedCountry._id : null,
+          region: selectedRegion ? selectedRegion._id : null,
+          address: selectedAddress ? selectedAddress._id : null
+        };
+        const response = await axios.post(addressesUrl, addressParams, {
           headers: {
             Authorization: user
           }
@@ -147,13 +217,18 @@ const RegisterPacient = () => {
     fetchAddresses();
     fetchEthnicGroups();
     fetchOcupations();
-  }, [isOccupationModalOpen, isAddressModalOpen]);
+    fetchEducationalLevels();
+  }, [isOccupationModalOpen, isAddressModalOpen, selectedCountry, selectedRegion]);
 
   const handleEthnicGroupChange = (event, value) => {
     setSelectedEthnicGroup(value);
   };
   const handleOccupationChange = (event, value) => {
     setSelectedOccupation(value);
+  };
+
+  const handleEducationalLevelChange = (event, value) => {
+    setSelectedEducationalLevel(value);
   };
 
   const handleCountryChange = (event, value) => {
@@ -178,37 +253,43 @@ const RegisterPacient = () => {
 
   const registPerson = async () => {
     try {
-      const response = await axios.post(baseUrl, form);
-      if (response.data.length > 0) {
-        // Success
-      } else {
-        alert('No se registró el Paciente');
+      console.log(form);
+      form.gender = genderParam.id;
+      form.ethnicGroup = selectedEthnicGroup._id;
+      form.occupation = selectedOccupation._id;
+      form.maritalStatus = maritalStatusParam.id;
+      form.address = selectedAddress._id;
+      form.educationalLevel = selectedEducationalLevel._id;
+
+      const response = await axios.post(baseUrl, form, {
+        headers: {
+          Authorization: user
+        }
+      });
+      
+      if (response.data) {
+        alert('ID Card Number Generated: ' + response.data.idCardNumber);
+        navigate("/NewPatient");
       }
+      setForm();
     } catch (error) {
-      console.log(error);
+      alert('Error: ' + error.message);
+      console.log(error.mesage);
     }
   };
-
-  /*const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };*/
 
   const openAddressModal = () => {
     setIsAddressModalOpen(true);
   };
-  
+
   const closeAddressModal = () => {
     setIsAddressModalOpen(false);
   };
-  
+
   const openOccupationModal = () => {
     setIsOccupationModalOpen(true);
   };
-  
+
   const closeOccupationModal = () => {
     setIsOccupationModalOpen(false);
   };
@@ -262,15 +343,23 @@ const RegisterPacient = () => {
       />
       <br />
       <label>Gender:</label>
-      <select
-        className="form-control"
-        name="gender"
-        onChange={handleChange}
-      >
-        <option value="" disabled>Select Gender</option>
-        <option value="M">Male</option>
-        <option value="F">Female</option>
-      </select>
+      <Autocomplete
+        value={genderParam}
+        onChange={(event, newValue) => {
+          setGenderParam(newValue);
+        }}
+        disablePortal
+        id="gender"
+        getOptionLabel={(option) => option.name}
+        options={genderOptions}
+        sx={{ width: 300 }}
+        renderOption={(props, option) => (
+          <Box component="li" {...props} key={option.id}>
+            {option.name}
+          </Box>
+        )}
+        renderInput={(params) => <TextField {...params} label="Gender" />}
+        required />
       <br />
       <label>Ethnic Group:</label>
       <Autocomplete
@@ -320,22 +409,63 @@ const RegisterPacient = () => {
         onChange={handleChange}
       />
       <br />
-      <div>
-        <h4>Address</h4>
-        <label>Country:</label>
-        <Autocomplete
-        options={countries}
-        getOptionLabel={(country) => country.name}
-        value={selectedCountry}
-        onChange={handleCountryChange}
+      <label>Marital Status:</label>
+      <Autocomplete
+        value={maritalStatusParam}
+        onChange={(event, newValue) => {
+          setMaritalStatusParam(newValue);
+        }}
+        disablePortal
+        id="gender"
+        getOptionLabel={(option) => option.name}
+        options={maritalStatusOptions}
+        sx={{ width: 300 }}
+        renderOption={(props, option) => (
+          <Box component="li" {...props} key={option.id}>
+            {option.name}
+          </Box>
+        )}
+        renderInput={(params) => <TextField {...params} label="Marital Status" />}
+        required />
+      <br />
+      <label>Phone Number: </label>
+      <input
+        type="text"
+        className="form-control"
+        name="phonenumber"
+        onChange={handleChange}
+      />
+      <br />
+      <label>Educational Level:</label>
+      <Autocomplete
+        options={educationalLevels}
+        getOptionLabel={(educationalLevel) => educationalLevel.name}
+        value={selectedEducationalLevel}
+        onChange={handleEducationalLevelChange}
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Country"
+            label="Educational Level"
             variant="outlined"
           />
         )}
       />
+      <div>
+        <h4>Address</h4>
+        <label>Country:</label>
+        <Autocomplete
+          options={countries}
+          getOptionLabel={(country) => country.name}
+          value={selectedCountry}
+          onChange={handleCountryChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Country"
+              variant="outlined"
+            />
+          )}
+        />
         <label>Region:</label>
         <Autocomplete
           options={regions}
@@ -363,19 +493,19 @@ const RegisterPacient = () => {
               variant="outlined"
               required />
           )}
-        required />
+          required />
         {isAddressModalOpen && <AddressForm />}
-          <Button handleShowForm={openAddressModal} />
+        <Button handleShowForm={openAddressModal} />
 
-          <Modal
-            isOpen={isAddressModalOpen}
-            onRequestClose={closeAddressModal}
-            contentLabel="Address Form Modal"
-          >
-            <h2>Address Form</h2>
-            <AddressForm />
-            <button onClick={closeAddressModal}>Close</button>
-          </Modal>
+        <Modal
+          isOpen={isAddressModalOpen}
+          onRequestClose={closeAddressModal}
+          contentLabel="Address Form Modal"
+        >
+          <h2>Address Form</h2>
+          <AddressForm />
+          <button onClick={closeAddressModal}>Close</button>
+        </Modal>
         <br />
       </div>
       <button className="btn btn-primary" onClick={registPerson}>Create</button>

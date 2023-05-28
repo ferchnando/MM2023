@@ -8,6 +8,7 @@ import LoginPage from "./pages/Login";
 import LogoutPage from "./pages/Logout";
 import NewPatientPage from "./pages/RegisterPacient";
 import UnauthorizedPage from "./pages/Unauthorized";
+import PersonListForm from "./pages/PersonsListForm";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route element={<RequireAuth />}>
               <Route path="/NewPatient" element={<NewPatientPage />} />
+              <Route path="/PersonsList" element={<PersonListForm />} />
             </Route>
           </Route>
         </Routes>
