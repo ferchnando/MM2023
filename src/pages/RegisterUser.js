@@ -3,6 +3,10 @@ import { useState } from 'react';
 import React, {Component}  from "react";
 import Axios from "axios";
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config';
+
+const baseUrl = API_BASE_URL+'registerUser';
+
 
 function RegUser(){
 
@@ -15,7 +19,7 @@ const [role, setRole]= useState("");
 const [image, setImage]= useState("");
 
     const registrarUsuario =()=>{
-        Axios.post("http://localhost:3000/api/v1/registerUser",{
+        Axios.post(baseUrl,{
        
            name:name,
            surname:surnmane,

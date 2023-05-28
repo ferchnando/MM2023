@@ -16,7 +16,7 @@ const root = createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <RegisterPacient />
+    <Inicio />
   </React.StrictMode>
 );
 
