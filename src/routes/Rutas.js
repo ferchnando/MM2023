@@ -1,7 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route,  } from "react-router-dom";
 import Inicio from "../pages/Inicio";
-import Menu from "../pages/Menu";
+//import Menu from "../pages/Menu";
+//import RegistrarPaciente from "../pages/RegistrarPaciente";
+import RegisterPacient from "../pages/RegisterPacient";
 
 
 function Rutas() {
@@ -10,7 +12,7 @@ function Rutas() {
     <Router>
       <Switch>
         <Route exact path="/" component={Inicio}/>
-        <Route exact path="/menu" component={Menu}/>
+        <Route exact path="../RegisterPacient" component={RegisterPacient}/>
       </Switch>
     </Router>
   );

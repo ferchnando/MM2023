@@ -47,4 +47,4 @@ const [image, setImage]= useState("");
     );
        
 }
-export default RegisterUser;
+export default RegUser;

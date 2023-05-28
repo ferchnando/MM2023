@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from 'sweetalert2';
-import Swal from 'sweetalert2'
 
 function RegistrarPaciente(){
 
@@ -31,7 +30,7 @@ const [editar, setEditar]= useState(false);
 
 
 const registrarPaciente =()=>{
- Axios.post("http://localhost:3001/api/v1/person",{
+ Axios.post("http://localhost:3000/api/v1/person",{
 
     ident:ident,
     primerN:primerN,

@@ -4,15 +4,20 @@ import '../css/Login.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
+import { useHistory } from "react-router-dom";
 
 const baseUrl='http://localhost:3000/api/v1/loginUser';
 const cookies = new Cookies();
 
+
 class Inicio extends Component {
+
+    
     state={
         form:{
             email: '',
-            password: ''
+            password: '',
+            gethash:'x'
        
         }
     }
@@ -27,10 +32,10 @@ class Inicio extends Component {
     }
 
     iniciarSesion=async()=>{
-        await axios.get(baseUrl, {params: {email: this.state.form.email, password:this.state.form.password}})
+       await axios.post(baseUrl,{email: this.state.form.email, password:this.state.form.password, gethash:this.state.form.gethas})
         .then(response=>{
             return response.data;
-            
+          
         })
         .then(response=>{
             if(response.length>0){
@@ -39,20 +44,20 @@ class Inicio extends Component {
                 cookies.set('surname', respuesta.surname, {path: "/"});
                 cookies.set('email', respuesta.email, {path: "/"});
                 alert(`Bienvenido ${respuesta.nombre} ${respuesta.email}`);
-                window.location.href="./menu";
+                
             }else{
                 alert('El usuario o la contraseña no son correctos');
+                window.location = '/RegisterPacient';
             }
         })
         .catch(error=>{
             console.log(error);
-        })
-
+        }) 
     }
 
     componentDidMount() {
         if(cookies.get('email')){
-            window.location.href="./menu";
+          //window.location.href="../menu";
         }
     }
     
