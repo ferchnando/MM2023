@@ -3,6 +3,9 @@ import { useState } from 'react';
 import Axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config';
+
+const baseUrl = API_BASE_URL+'person';
 
 function RegistrarPaciente(){
 
@@ -30,7 +33,7 @@ const [editar, setEditar]= useState(false);
 
 
 const registrarPaciente =()=>{
- Axios.post("http://localhost:3000/api/v1/person",{
+ Axios.post(baseUrl,{
 
     ident:ident,
     primerN:primerN,

@@ -10,14 +10,13 @@ import Inicio from './pages/Inicio';
 import RegisterPacient from './pages/RegisterPacient';
 import GrupoEthnic from './pages/GrupoEthnic';
 import AddressForm from './pages/Address';
-import { BrowserRouter } from "react-router-dom";
 
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 
 root.render(
-  <React.BrowserRouter>
-    <RegisterPacient />
-  </React.BrowserRouter>
+  <React.StrictMode>
+    <Inicio />
+  </React.StrictMode>
 );
 

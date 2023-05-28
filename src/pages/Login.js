@@ -3,9 +3,9 @@ import '../css/Login.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios';
 //import md5 from 'md5';
+import { API_BASE_URL } from '../config';
 
-
-const baseUrl="localhost:3000/api/v1/registerUser";
+const baseUrl = API_BASE_URL+'registerUser';
 
 
 class Login extends Component {

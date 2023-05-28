@@ -4,8 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 import { useHistory } from "react-router-dom";
+import { API_BASE_URL } from '../config';
 
-const baseUrl='http://localhost:3000/api/v1/ethnic-groups';
+const baseUrl = API_BASE_URL+'ethnic-groups';
 const cookies = new Cookies();
 
 
