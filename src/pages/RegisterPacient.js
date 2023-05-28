@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 import AddressForm from './Address';
 import { API_BASE_URL } from '../config';
 //import {Routes, Route, useNavigate} from 'react-router-dom';
+import { Link } from "react-router-dom";
 const baseUrl = API_BASE_URL+'Person';
 
 const Button = ({ handleShowForm }) => (
@@ -134,6 +135,7 @@ class RegisterPacient extends Component {
 
             <br />
             <label>ethnicGroup:</label>
+            <button className="btn btn-primary" >Crear Grupo etnico</button>
             <br />
             <input
               type="text"
