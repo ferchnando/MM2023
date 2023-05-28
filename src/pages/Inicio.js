@@ -36,7 +36,7 @@ class Inicio extends Component {
        await axios.post(baseUrl,{email: this.state.form.email, password:this.state.form.password, gethash:this.state.form.gethas})
         .then(response=>{
             return response.data;
-          
+          console.log(response.data);
         })
         .then(response=>{
             if(response.length>0){
@@ -48,7 +48,7 @@ class Inicio extends Component {
                 
             }else{
                 alert('El usuario o la contraseña no son correctos');
-                window.location = '/RegisterPacient';
+                //window.location = '/RegisterPacient';
             }
         })
         .catch(error=>{
