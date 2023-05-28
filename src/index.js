@@ -17,7 +17,7 @@ const root = createRoot(rootElement);
 
 root.render(
   <React.BrowserRouter>
-    <RegisterPacient />
+    <Inicio />
   </React.BrowserRouter>
 );
 

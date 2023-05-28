@@ -16,7 +16,6 @@ function Rutas() {
       <Routes>
         <Route exact path="/" component={Inicio}/>
         <Route exact path="../RegisterPacient" component={RegisterPacient}/>
-        <Route exact path="../GrupoEthnic" component={GrupoEthnic}/>
       </Routes>
     </Router>
   );
