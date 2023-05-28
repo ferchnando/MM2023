@@ -1,84 +1,92 @@
-import React, {Component} from "react";
-import '../css/Login.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-//import md5 from 'md5';
+
+import { useAuth } from "../context/Auth";
 import { API_BASE_URL } from '../config';
 
-const baseUrl = API_BASE_URL+'registerUser';
+const baseUrl = API_BASE_URL + 'loginUser';
 
 
-class Login extends Component {
+const Login = () => {
+    const [username, setUsername] = useState("");
+    const { setUser } = useAuth();
+    const navigate = useNavigate();
+
+    const [form, setForm] = useState({
+        email: '',
+        password: '',
+        gethash: 'x',
+    });
+    const [error, setError] = useState(false);
 
 
-    state={
-        form:{
-            username: '',
-            password: ''
-         }    
-    }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm((prevForm) => ({
+            ...prevForm,
+            [name]: value,
+        }));
+        setError(false);
+    };
 
-    handleChange=async e=>{
-       await this.setState({
-            form:{
-                ...this.state.form,
-                [e.target.name]: e.target.value
+    const login = useCallback(
+        async (e) => {
+            e.preventDefault();
+
+            try {
+                console.log(form);
+                const loginResponse = await axios.post(baseUrl, form);
+                console.log(loginResponse);
+                if (loginResponse.data.token) {
+                    setUser( loginResponse.data.token );
+                    navigate("/NewPatient");
+                } else {
+                    setError(true); // Error de autenticación
+                }
+            } catch (error) {
+                setError(true); // Error de autenticación
             }
-        });
-        console.log(this.state.form)
-    }
+        },
+        [setUser, form, username]
+    );
 
-    iniciarSesion=async()=>{
-        await axios.get(baseUrl, {params: {username: this.state.form.username, password:this.state.form.password}})
-        .then(response=>{
-            return response.data;
-        })
-        /*.then(response=>{
-            if(response.length>0){
-                var respuesta=response[0];
-                cookies.set('id', respuesta.id, {path: "/"});
-                cookies.set('apellido_paterno', respuesta.apellido_paterno, {path: "/"});
-                cookies.set('apellido_materno', respuesta.apellido_materno, {path: "/"});
-                cookies.set('nombre', respuesta.nombre, {path: "/"});
-                cookies.set('username', respuesta.username, {path: "/"});
-                alert(`Bienvenido ${respuesta.nombre} ${respuesta.apellido_paterno}`);
-                window.location.href="./menu";
-            }else{
-                alert('El usuario o la contraseña no son correctos');
-            }
-        })*/
-        .catch(error=>{
-            console.log(error);
-        })
-    }
-    render(){
-        return(
-            <div className="containerPrincipal">
+    const { email, password } = form;
+    const emailClassName = error ? 'form-control is-invalid' : 'form-control';
+    const passwordClassName = error ? 'form-control is-invalid' : 'form-control';
+
+    return (
+        <div className="containerPrincipal">
             <div className="containerSecundario">
-              <div className="form-group">
-                <label>Usuario: </label>
-                <br />
-                <input
-                  type="text"
-                  className="form-control"
-                  name="username"
-                  onChange={this.handleChange}
-                />
-                <br />
-                <label>Contraseña: </label>
-                <br />
-                <input
-                  type="password"
-                  className="form-control"
-                  name="password"
-                  onChange={this.handleChange}
-                />
-                <br />
-                <button className="btn btn-primary" onClick={()=> this.iniciarSesion()}>Iniciar Sesión</button>
-              </div>
+                <div className="form-group">
+                    <label>Email: </label>
+                    <br />
+                    <input
+                        type="text"
+                        className={emailClassName}
+                        name="email"
+                        value={email}
+                        onChange={handleChange}
+                    />
+                    <br />
+                    <label>Contraseña: </label>
+                    <br />
+                    <input
+                        type="password"
+                        className={passwordClassName}
+                        name="password"
+                        value={password}
+                        onChange={handleChange}
+                    />
+                    {error && <div className="invalid-feedback">Datos incorrectos</div>}
+                    <br />
+                    <button className="btn btn-primary" onClick={login}>
+                        Iniciar Sesión
+                    </button>
+                </div>
             </div>
-          </div>
-        );
-    }
-}
- export default Login;
+        </div>
+    );
+};
+
+export default Login;

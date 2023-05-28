@@ -1,97 +1,82 @@
-
-import React, { Component } from 'react';
-import '../css/Login.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
-import { useHistory } from "react-router-dom";
 import { API_BASE_URL } from '../config';
 
-const baseUrl = API_BASE_URL+'loginUser';
+const baseUrl = API_BASE_URL + 'loginUser';
 const cookies = new Cookies();
 
+const Inicio = () => {
+  //const navigate = useNavigate();
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    gethash: 'x',
+  });
+  const [error, setError] = useState(false);
 
-class Inicio extends Component {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+    }));
+    setError(false);
+  };
 
-    
-    state={
-        form:{
-            email: '',
-            password: '',
-            gethash:'x'
-       
-        }
+  const iniciarSesion = async () => {
+    try {
+      const loginResponse = await axios.post(baseUrl, form);
+      console.log(loginResponse.data.token);
+      if (loginResponse.data.token) {
+        cookies.set('token', loginResponse.data.token, { path: '/' });
+        cookies.set('email', form.email, { path: '/' });
+        //navigate('/RegisterPacient'); // Redireccionar a la vista RegisterPacient
+      } else {
+        setError(true); // Error de autenticación
+      }
+    } catch (error) {
+      setError(true); // Error de autenticación
     }
+  };
 
-    handleChange=async e=>{
-        await this.setState({
-            form:{
-                ...this.state.form,
-                [e.target.name]: e.target.value
-            }
-        });
-    }
+  const { email, password } = form;
+  const emailClassName = error ? 'form-control is-invalid' : 'form-control';
+  const passwordClassName = error ? 'form-control is-invalid' : 'form-control';
 
-    iniciarSesion=async()=>{
-       await axios.post(baseUrl,{email: this.state.form.email, password:this.state.form.password, gethash:this.state.form.gethas})
-        .then(response=>{
-            return response.data;
-          console.log(response.data);
-        })
-        .then(response=>{
-            if(response.length>0){
-                var respuesta=response[0];
-                cookies.set('name', respuesta.name, {path: "/"});
-                cookies.set('surname', respuesta.surname, {path: "/"});
-                cookies.set('email', respuesta.email, {path: "/"});
-                alert(`Bienvenido ${respuesta.email}`);
-                
-            }else{
-                alert('El usuario o la contraseña no son correctos');
-                //window.location = '/RegisterPacient';
-            }
-        })
-        .catch(error=>{
-            console.log(error);
-        }) 
-    }
-
-    componentDidMount() {
-        if(cookies.get('email')){
-          //window.location.href="../menu";
-        }
-    }
-    
-
-    render() {
-        return (
+  return (
     <div className="containerPrincipal">
-        <div className="containerSecundario">
-          <div className="form-group">
-            <label>Email: </label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="email"
-              onChange={this.handleChange}
-            />
-            <br />
-            <label>Contraseña: </label>
-            <br />
-            <input
-              type="password"
-              className="form-control"
-              name="password"
-              onChange={this.handleChange}
-            />
-            <br />
-            <button className="btn btn-primary" onClick={()=> this.iniciarSesion()}>Iniciar Sesión</button>
-          </div>
+      <div className="containerSecundario">
+        <div className="form-group">
+          <label>Email: </label>
+          <br />
+          <input
+            type="text"
+            className={emailClassName}
+            name="email"
+            value={email}
+            onChange={handleChange}
+          />
+          <br />
+          <label>Contraseña: </label>
+          <br />
+          <input
+            type="password"
+            className={passwordClassName}
+            name="password"
+            value={password}
+            onChange={handleChange}
+          />
+          {error && <div className="invalid-feedback">Datos incorrectos</div>}
+          <br />
+          <button className="btn btn-primary" onClick={iniciarSesion}>
+            Iniciar Sesión
+          </button>
         </div>
       </div>
-        );
-    }
-}
+    </div>
+  );
+};
 
 export default Inicio;
