@@ -9,6 +9,7 @@ import Menu from './pages/Menu';
 import Inicio from './pages/Inicio';
 import RegisterPacient from './pages/RegisterPacient';
 import GrupoEthnic from './pages/GrupoEthnic';
+import AddressForm from './pages/Address';
 import { BrowserRouter } from "react-router-dom";
 
 const rootElement = document.getElementById('root');

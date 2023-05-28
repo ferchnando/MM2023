@@ -1,111 +1,87 @@
 
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import '../css/RegisterPacient.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import Modal from 'react-modal';
+import AddressForm from './Address';
+import { API_BASE_URL } from '../config';
 //import {Routes, Route, useNavigate} from 'react-router-dom';
 import { Link } from "react-router-dom";
+const baseUrl = API_BASE_URL+'Person';
 
-const baseUrl='http://localhost:3000/api/v1/Person';
-
-/*function IngresarDireccion(){
-    const [arrayGrupos, setgrupo] = React.useState(["MESTIZO","INDOAMERICANO"]);
-    
-    function addItem(){
-
-      setgrupo((array)) => {
-        return [...array, `Elemento $${thingsArray.length + 1}`];
-      }
-    }
-
-    const grupos = arrayGrupos.map(grupo=> <p key={grupo}>{grupo}</p>)
-
-    return (
-      <div>
-            <button onClick={addItem}>Agregar Grupo</button>
-            {elementos}
-        </div>
-    )
-
- }*/
+const Button = ({ handleShowForm }) => (
+  <div>
+    <button className="btn btn-primary" onClick={handleShowForm}>Create New Address</button>
+  </div>
+);
 
 class RegisterPacient extends Component {
-    
-  
-  
-  state={
-        form:{
-            identification: '',
-            firstname: '',
-            secondname:'',
-            paternallastname:'',
-            maternalLastname:'',
-            gender:'',
-            ethnicGroup:[],
-            occupation:'',
-            birthdate:'',
-            maritalStatus:'',
-            phonenumber:'',
-            address:[],
-            educationalLevel:'',
-            related:'',
-            relationship:'',
-            image:''
-        }
+  state = {
+    form: {
+      identification: '',
+      firstname: '',
+      secondname: '',
+      paternallastname: '',
+      maternalLastname: '',
+      gender: '',
+      ethnicGroup: [],
+      occupation: '',
+      birthdate: '',
+      maritalStatus: '',
+      phonenumber: '',
+      address: [],
+      educationalLevel: '',
+      related: '',
+      relationship: '',
+      image: ''
+    },
+    isModalOpen: false
+  };
+
+  handleChange = (e) => {
+    const { name, value } = e.target;
+    this.setState((prevState) => ({
+      form: {
+        ...prevState.form,
+        [name]: value
+      }
+    }));
+  };
+
+  registPerson = async () => {
+    try {
+      const response = await axios.post(baseUrl, this.state.form);
+      if (response.data.length > 0) {
+        // Success
+      } else {
+        alert('No se registró el Paciente');
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
+  openModal = () => {
+    this.setState({ isModalOpen: true });
+  };
 
-
-    handleChange=async e=>{
-        await this.setState({
-            form:{
-                ...this.state.form,
-                [e.target.name]: e.target.value
-            }
-        });
-    }
-
-    registPerson=async()=>{
-       await axios.post(baseUrl,{identification: this.state.form.identification, firstname:this.state.form.firstname, 
-        secondname:this.state.form.secondname, paternallastname:this.state.form.paternallastname, gender:this.state.form.gender,
-        ethnicGroup:this.state.form.ethnicGroup, occupation:this.state.form.occupation, birthdate:this.state.form.birthdate,
-        maritalStatus:this.state.form.maritalStatus, address:this.form.address})
-        .then(response=>{
-            return response.data;
-          
-        })
-        .then(response=>{
-            if(response.length>0){
-               
-            }else{
-                alert('No se registro el Paciente');
-                //window.location.href="./RegisterPacient";
-            }
-        })
-        .catch(error=>{
-            console.log(error);
-        }) 
-    }
-
-    /*componentDidMount() {
-        if(cookies.get('email')){
-          //window.location.href="../menu";
-        }*/
-    
-    
+  closeModal = () => {
+    this.setState({ isModalOpen: false });
+  };
 
     render() {
-        return (
-          <div className="form-group">
-          <h1>CREAR PACIENTE </h1>
-            <label>Identification: </label>
-            <br />
-            <input
-              type="text"
-              className="form-control"
-              name="identification"
-              onChange={this.handleChange}
-            />
+    return (
+      <div className="form-group">
+        <h1>CREAR PACIENTE</h1>
+        <label>Identification: </label>
+        <br />
+        <input
+          type="text"
+          className="form-control"
+          name="identification"
+          onChange={this.handleChange}
+        />
             <br />
             <label>firstname: </label>
             <br />
@@ -194,6 +170,18 @@ class RegisterPacient extends Component {
             <br />
             <div>
             <label>DIRECCION:</label>
+          {this.state.isModalOpen && <AddressForm />}
+          <Button handleShowForm={this.openModal} />
+
+          <Modal
+            isOpen={this.state.isModalOpen}
+            onRequestClose={this.closeModal}
+            contentLabel="Address Form Modal"
+          >
+            <h2>Address Form</h2>
+            <AddressForm />
+            <button onClick={this.closeModal}>Close</button>
+          </Modal>
             <br />
             <label>calle </label>
             <input
