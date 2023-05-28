@@ -5,6 +5,8 @@ import Inicio from "../pages/Inicio";
 //import Menu from "../pages/Menu";
 //import RegistrarPaciente from "../pages/RegistrarPaciente";
 import RegisterPacient from "../pages/RegisterPacient";
+import GrupoEthnic from "../pages/GrupoEthnic";
+
 
 
 function Rutas() {
@@ -14,6 +16,7 @@ function Rutas() {
       <Routes>
         <Route exact path="/" component={Inicio}/>
         <Route exact path="../RegisterPacient" component={RegisterPacient}/>
+        <Route exact path="../GrupoEthnic" component={GrupoEthnic}/>
       </Routes>
     </Router>
   );

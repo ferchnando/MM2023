@@ -9,13 +9,14 @@ import Menu from './pages/Menu';
 import Inicio from './pages/Inicio';
 import RegisterPacient from './pages/RegisterPacient';
 import GrupoEthnic from './pages/GrupoEthnic';
+import { BrowserRouter } from "react-router-dom";
 
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 
 root.render(
-  <React.StrictMode>
+  <React.BrowserRouter>
     <RegisterPacient />
-  </React.StrictMode>
+  </React.BrowserRouter>
 );
 

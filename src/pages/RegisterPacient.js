@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import '../css/RegisterPacient.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-
+//import {Routes, Route, useNavigate} from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const baseUrl='http://localhost:3000/api/v1/Person';
 
@@ -29,7 +30,10 @@ const baseUrl='http://localhost:3000/api/v1/Person';
  }*/
 
 class RegisterPacient extends Component {
-    state={
+    
+  
+  
+  state={
         form:{
             identification: '',
             firstname: '',
@@ -49,6 +53,8 @@ class RegisterPacient extends Component {
             image:''
         }
     }
+
+
 
     handleChange=async e=>{
         await this.setState({
@@ -153,7 +159,7 @@ class RegisterPacient extends Component {
 
             <br />
             <label>ethnicGroup:</label>
-            <button className="btn btn-primary" >Crear Grupo etnico</button>
+            <Link to="../GrupoEthnic">Haz clic para ver la página de contacto</Link>
             <br />
             <input
               type="text"
