@@ -5,8 +5,6 @@ import Inicio from "../pages/Inicio";
 //import Menu from "../pages/Menu";
 //import RegistrarPaciente from "../pages/RegistrarPaciente";
 import RegisterPacient from "../pages/RegisterPacient";
-import GrupoEthnic from "../pages/GrupoEthnic";
-
 
 
 function Rutas() {
